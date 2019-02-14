@@ -6,16 +6,28 @@ Soduku Rules
 
 """
 
+"""
+	[1,6,5,9,0,0,0,4,0],
+	[0,0,0,4,5,8,0,6,2],
+	[4,8,0,0,7,0,5,0,3],
+	[0,2,6,5,8,0,4,0,0],
+	[5,0,1,0,0,4,0,8,6],
+	[0,0,8,2,0,9,7,0,1],
+	[8,5,3,0,1,0,9,0,0],
+	[0,7,0,3,0,5,0,1,8],
+	[6,0,0,0,4,2,3,7,0]
+"""
+
 sodukuPuzzle = [
-	[0, 0, 0, 7, 2, 0, 1, 0, 4],
-	[7, 0, 1, 0, 0, 9, 8, 6, 0],
-	[2, 9, 4, 0, 8, 1, 0, 0, 7],
-	[8, 0, 6, 5, 0, 0, 0, 4, 3],
-	[0, 0, 9, 1, 6, 0, 2, 7, 0],
-	[5, 7, 0, 9, 3, 0, 0, 0, 8],
-	[9, 2, 0, 4, 0, 7, 0, 8, 0],
-	[0, 8, 3, 0, 9, 6, 7, 0, 0],
-	[0, 6, 0, 0, 0, 3, 4, 2, 9]]
+	[0,5,0,0,0,4,9,0,0],
+	[0,0,6,2,5,0,0,0,0],
+	[4,9,1,7,0,0,0,0,5],
+	[6,8,9,3,0,0,2,0,7],
+	[0,0,0,0,2,0,0,0,0],
+	[7,0,2,0,0,6,3,1,9],
+	[3,0,0,0,0,5,7,6,1],
+	[0,0,0,0,7,2,4,0,0],
+	[0,0,4,1,0,0,0,8,0]]
 
 boxRow = 3
 boxes = 9
@@ -61,38 +73,33 @@ def solving_algorithm(sodukuPuzzle):
 		if sum(numFreq)/len(numFreq) == 9:
 			solved = True
 			break
-		else:
-			lastFreq = 0
-			## This checks what number shows up the most and will then use it.
-			for currNum, freq in enumerate(numFreq):
-				if freq != 9:
-					if freq > lastFreq:
-						lastFreq = freq
-						iValue = currNum+1
 
 		for currBlockID, box in enumerate(blocksSimple):
-			if not(iValue in box):
-				## This goes over and checks if the current block has a specific number, if not the bot will try and place it in the block.
-				adjBlockLocs = []
-				currBlockLoc = get_val_loc(template, currBlockID)
+			
+			## This goes over and checks if the current block has a specific number, if not the bot will try and place it in the block.
+			adjBlockLocs = []
+			currBlockLoc = get_val_loc(template, currBlockID)
 
-				## Used to get the block locations of each adjacent block to the current one.
-				for blockID in boxAdjacent[currBlockID]:
-					adjBlockLocs.append(get_val_loc(template, blockID))
+			## Used to get the block locations of each adjacent block to the current one.
+			for blockID in boxAdjacent[currBlockID]:
+				adjBlockLocs.append(get_val_loc(template, blockID))
 
-				blockWildcard = get_wildcard(currBlockLoc, adjBlockLocs, blocksComplex, iValue)
+			for number, freq in enumerate(numFreq):
+				iValue = number+1
+				if iValue not in blocksSimple[currBlockID] and freq < 9:
+					blockWildcard = get_wildcard(currBlockLoc, adjBlockLocs, blocksComplex, iValue)
 
-				numberOfOpen = 0
-				## This is used to check if there is a sutible location to place a number based on the block wildcard.
-				for row in blockWildcard:
-					for element in row:
-						if element != 'x':
-							numberOfOpen += 1
+					numberOfOpen = 0
+					## This is used to check if there is a sutible location to place a number based on the block wildcard.
+					for row in blockWildcard:
+						for element in row:
+							if element != 'x':
+								numberOfOpen += 1
 
-				if numberOfOpen == 1:
-					toPlace = get_val_loc(blockWildcard, '')
-					if blocksComplex[currBlockID][toPlace[0]][toPlace[1]] == 0:
-						blocksComplex[currBlockID][toPlace[0]][toPlace[1]] = iValue
+					if numberOfOpen == 1:
+						toPlace = get_val_loc(blockWildcard, '')
+						if blocksComplex[currBlockID][toPlace[0]][toPlace[1]] == 0:
+							blocksComplex[currBlockID][toPlace[0]][toPlace[1]] = iValue
 
 				## This will just turn complex blocks back into block lists
 				blocksSimple[currBlockID] = build_block(blocksComplex[currBlockID], style='simple')
